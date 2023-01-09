@@ -2,8 +2,15 @@ var express = require('express');
 var router = express.Router();
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+
+const registerController = require('../controllers/register');
+
+router.get('/register', registerController.startRegistration);
+router.get('/register-password', registerController.choosePassword);
+
+
+router.post('/add-contact', registerController.addUserContact);
+
+
 
 module.exports = router;
