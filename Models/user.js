@@ -18,19 +18,26 @@ module.exports = class User {
         this.password = password;
     }
 
-    addContactDetails() {
-        console.log(usersList);
+    emailTaken(){
         for (const user of usersList){
-            if (user.email === this.email) {
+            if (user.email.toLowerCase() === this.email.toLowerCase()) {
                 throw new Error('Email already registered, try another');
             }
         }
+    }
+
+    addContactDetails() {
+        console.log(usersList);
+        this.emailTaken();
+
         usersList.push(this);
         console.log('user added', usersList);
     }
 
-
-
-
+    matchPasswords(first, second){
+        if (first !== second)
+            throw new Error('Passwords Don`t match ! try again...');
+        this.emailTaken();
+    }
 
 };
