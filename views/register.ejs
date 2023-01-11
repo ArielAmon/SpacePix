@@ -1,10 +1,35 @@
 
 <%- include('includes/head.ejs') %>
 <link rel="stylesheet" href="/stylesheets/register.css">
-<script src="/javascripts/register.js"></script>
+<!--<script src="/javascripts/register.js"></script>-->
 </head>
 
 <body>
+
+<%- include('includes/contactInfoValidations.ejs') %>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+
+        const firstName = document.getElementById("firstName");
+        const lastName = document.getElementById("lastName");
+
+
+        document.getElementById("nextStep").addEventListener('click',(event)=>{
+
+            let cond1 = checkName(firstName);
+            let cond2 = checkName(lastName);
+            if( !cond1 || !cond2){
+                event.preventDefault();
+            }
+        })
+    });
+
+</script>
+
+
+
 <section class="vh-100 gradient-custom">
         <div class="container py-5 h-100">
             <div class="row d-flex justify-content-center align-items-center h-100">
@@ -21,26 +46,25 @@
                                         <h4><strong><%= error %></strong></h4>
                                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                     </div>
-
-
                                 <% } %>
+
                                 <p class="text-white-50 mb-1">Please enter your email address:</p>
                                 <form action="/users/add-contact" method="POST">
 
                                     <div class="form-outline form-white mb-4">
-                                        <input type="email" name="userEmail" id="userEmail" class="form-control form-control-lg" minlength="3" maxlength="32" required/>
+                                        <input type="email" name="userEmail" id="userEmail" value="<%= userEmail %>" class="form-control form-control-lg" minlength="3" maxlength="32" required/>
                                         <label class="form-label" for="userEmail">Email</label>
                                     </div>
 
                                     <p class="text-white-50 mb-1">Please enter your first name</p>
                                     <div class="form-outline form-white mb-4">
-                                        <input type="text" name="firstName" id="firstName" class="form-control form-control-lg" required/>
+                                        <input type="text" name="firstName" id="firstName" value="<%= userFirstName %>" class="form-control form-control-lg" required/>
                                         <label class="form-label" for="firstName">First name</label>
                                     </div>
 
                                     <p class="text-white-50 mb-1">Please enter your last name</p>
                                     <div class="form-outline form-white mb-4">
-                                        <input type="text" name="lastName" id="lastName" class="form-control form-control-lg" required/>
+                                        <input type="text" name="lastName" id="lastName" value="<%= userLastName %>" class="form-control form-control-lg" required/>
                                         <label class="form-label" for="lastName">Last name</label>
                                     </div>
 

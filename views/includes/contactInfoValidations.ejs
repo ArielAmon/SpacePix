@@ -1,6 +1,4 @@
-"use strict";
-
-(()=>{
+<script>
 
     function errorElement(){
         return ` <div id="formatError" class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -23,20 +21,4 @@
         return true;
     }
 
-
-    document.addEventListener("DOMContentLoaded", () => {
-
-        const firstName = document.getElementById("firstName");
-        const lastName = document.getElementById("lastName");
-
-        document.getElementById("nextStep").addEventListener('click',(event)=>{
-            let cond1 = checkName(firstName);
-            let cond2 = checkName(lastName);
-            if( !cond1 || !cond2){
-                event.preventDefault();
-            }
-        })
-
-
-    });
-})();
+</script>
