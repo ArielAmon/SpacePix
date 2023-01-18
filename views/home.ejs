@@ -1,25 +1,24 @@
 <%- include('includes/head.ejs') %>
-<link rel="stylesheet" href="/stylesheets/home.css">
+<link rel="stylesheet" href="stylesheets/home.css">
 <script src="javascripts/SpacePix.js"></script>
 </head>
 <body>
 
 <div id="main-page">
-    <div class="bg-image" style="background-image: url('../public/Images/Background.jpg'); background-size: cover; background-attachment: fixed;">
-
+    <div class="bg-image">
         <section class="py-5 text-center container">
-            <div class="row py-5">
+            <div class="row py-5 mb-3">
                 <div class="col-lg-6 col-md-8 mx-auto">
                     <h1 class="text-white display-4 mb-4 fw-normal">🌜SpacePix🚀</h1>
                     <p class="lead text-white fw-bold">Welcome to SpacePix! Here, you can connect with like-minded individual and share your thoughts and ideas by browse images from NASA's website. We encourage you to engage with others by commenting on their posts and starting your own discussions. Whether you're a space enthusiast or just looking for a new online community, we hope you'll find something of interest here. Thank you for joining us !</p>
                 </div>
             </div>
             <div class="row justify-content-center py-5">
-          <span class="datepicker-toggle">
-             <span class="datepicker-toggle-button"></span>
-                <label class="form-label lead text-white fw-bold" for="date">Choose date to display your feed : </label>
-              <input type="date" id="date" class="datepicker-input">
-          </span>
+              <span class="datepicker-toggle">
+                 <span class="datepicker-toggle-button"></span>
+                    <label class="form-label lead text-white fw-bold" for="date">Choose date to display your feed : </label>
+                  <input type="date" id="date" class="datepicker-input">
+              </span>
             </div>
             <div class="row py-5">
                 <div class="col-lg-6 col-md-8 mx-auto">
@@ -68,6 +67,12 @@
         </div>
         <div id="toastContent" class="toast-body"></div>
     </div>
+</div>
+
+<div id="errorMessage" class="container justify-content-center py-5 text-center" style="display: none">
+    <h1 id="errorCode"></h1>
+    <h2 id="errorContent"></h2>
+    <h3 >Try reload the page..</h3>
 </div>
 
 <%- include('includes/end.ejs') %>

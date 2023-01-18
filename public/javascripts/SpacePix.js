@@ -422,6 +422,11 @@
             }
         };
 
+        nasaApi.getNasaContent(utilFuncs.dateFormater(currDate));
+        window.addEventListener("scroll", handleInfiniteScroll);
+
+
+
         loadBtn.addEventListener('click', ()=>{
             loadBtn.disabled = true;
             setTimeout(() => {
@@ -432,5 +437,7 @@
             nasaApi.getNasaContent(utilFuncs.dateFormater(currDate));
         })
     });
+
+
 
 })();
