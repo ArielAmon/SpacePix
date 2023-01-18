@@ -1,8 +1,8 @@
-const User = require('../models/user');
 const Cookies = require('cookies');
+const db = require('../models'); //contain the Contact model, which is accessible via db.Contact
+
 
 const keys = ['keyboard cat']
-let currUser;
 
 exports.startRegistration = (req, res) => {
     const cookies = new Cookies(req, res, {keys : keys});
@@ -49,13 +49,21 @@ exports.mainPage = (req, res) => {
 
 exports.addUserContact = (req, res) => {
     const cookies = new Cookies(req, res, {keys : keys});
+    cookies.set('email',req.body.userEmail,{signed : true, maxage : 30000});
+    cookies.set('firsName',req.body.firstName,{signed : true, maxage : 30000});
+    cookies.set('lastName',req.body.lastName,{signed : true, maxage : 30000});
     try {
-        const user = new User(req.body.userEmail, req.body.firstName, req.body.lastName, '');
-        currUser = user;
-        user.addContactDetails();
-        cookies.set('email',req.body.userEmail,{signed : true, maxage : 30000});
-        cookies.set('firsName',req.body.firstName,{signed : true, maxage : 30000});
-        cookies.set('lastName',req.body.lastName,{signed : true, maxage : 30000});
+        const { userEmail, firstName, lastName} = req.body;
+        const answer = db.User.create({ email:userEmail, firstName:firstName, lastName:lastName, password:""})
+            .then((contact) => {
+            console.log(contact.id);
+            })
+            .catch((err) => {
+                console.log('*** error creating a contact', JSON.stringify(contact))
+                return res.status(400).send(err)
+            });
+
+
         res.redirect('/users/register-password');
     } catch (err) {
         res.render('register', {
