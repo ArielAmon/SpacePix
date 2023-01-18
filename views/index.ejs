@@ -14,29 +14,30 @@
                         <div class="mb-md-5 mt-md-4 pb-5">
 
                             <% if (completed) { %>
-
                                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                                     <h4><strong><%= message %></strong></h4>
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
-
-
                             <% } %>
+
                             <h2 class="fw-bold mb-2 text-uppercase">Login</h2>
-                            <p class="text-white-50 mb-5">Please enter your login and password!</p>
+                            <p class="text-white-50 mb-5">Please enter your username and password to login!</p>
+                            <form action="/user-login" method="POST">
 
-                            <div class="form-outline form-white mb-4">
-                                <input type="email" id="userEmail" class="form-control form-control-lg" />
-                                <label class="form-label" for="userEmail">Email</label>
-                            </div>
+                                <div class="form-outline form-white mb-4">
+                                    <input type="email" id="userEmail" name="userEmail" class="form-control form-control-lg" required/>
+                                    <label class="form-label" for="userEmail">Email</label>
+                                </div>
 
-                            <div class="form-outline form-white mb-4">
-                                <input type="password" id="userPassword" class="form-control form-control-lg" />
-                                <label class="form-label" for="userPassword">Password</label>
-                            </div>
+                                <div class="form-outline form-white mb-4">
+                                    <input type="password" id="userPassword" name="userPassword" class="form-control form-control-lg" required/>
+                                    <label class="form-label" for="userPassword">Password</label>
 
-                            <button class="btn btn-outline-light btn-lg px-5" type="submit">Login</button>
+                                </div>
 
+                                <button class="btn btn-outline-light btn-lg px-5" type="submit">Login</button>
+
+                            </form>
                         </div>
 
                         <div>
