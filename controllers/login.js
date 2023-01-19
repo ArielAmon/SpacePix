@@ -1,4 +1,6 @@
+const Cookies = require('cookies');
 const db = require('../models'); //contain the Contact model, which is accessible via db.Contact
+const keys = ['keyboard cat']
 
 exports.mainPage = (req, res) => {
     res.render('index',{
@@ -12,8 +14,10 @@ exports.userLogin = (req, res) => {
     try {
         db.User.findOne({ where: { email: userEmail, password: userPassword} })
             .then((data) =>{
+                console.log()
                 if (data) {
-                    // use session to save name
+                    req.session.userName = `${data.firstName} ${data.lastName}`;
+                    req.session.isConnected = true;
                     res.redirect('/home');
                 } else {
                     res.render('index',{
@@ -22,7 +26,7 @@ exports.userLogin = (req, res) => {
                     });
                 }
             }).catch((err) => {
-            console.log('error creating a new user in DB');
+            console.log('error login', err);
             return res.status(400).send(err)
         });
     }

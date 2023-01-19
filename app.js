@@ -21,11 +21,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-//// cmy code
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/home', homeRouter);
-
 // enable sessions
 app.use(session({
     secret:"somesecretkey",
@@ -33,6 +28,23 @@ app.use(session({
     saveUninitialized: false, // Save a session that is new, but has not been modified
     cookie: {maxAge: 10*60*1000 } // milliseconds!
 }));
+
+app.use(login);
+
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+app.use('/home', homeRouter);
+
+function login (req, res, next){
+    if(req.session.isConnected === true){
+        next();
+    }else {
+
+    }
+}
+
+
+
 
 
 // // catch 404 and forward to error handler

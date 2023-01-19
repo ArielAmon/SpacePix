@@ -1,5 +1,7 @@
 const db = require('../models'); //contain the Contact model, which is accessible via db.Contact
 
 exports.homePage = (req, res) => {
-    res.render('home');
+    res.render('home',{
+        userName: req.session.userName
+    });
 };
