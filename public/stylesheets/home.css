@@ -1,0 +1,9 @@
+
+.bg-image{
+    background-image: url('/Images/Background.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+}
+#logoutButton{
+    float: right;
+}

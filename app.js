@@ -3,9 +3,11 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const session = require('express-session');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var homeRouter = require('./routes/home');
 
 var app = express();
 
@@ -19,9 +21,31 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-//// cmy code
+// enable sessions
+app.use(session({
+    secret:"somesecretkey",
+    resave: false, // Force save of session for each request
+    saveUninitialized: false, // Save a session that is new, but has not been modified
+    cookie: {maxAge: 10*60*1000 } // milliseconds!
+}));
+
+app.use(login);
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/home', homeRouter);
+
+function login (req, res, next){
+    if(req.session.isConnected === true){
+        next();
+    }else {
+
+    }
+}
+
+
+
+
 
 // // catch 404 and forward to error handler
 // app.use(function(req, res, next) {

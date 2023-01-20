@@ -1,0 +1,89 @@
+<%- include('includes/head.ejs') %>
+<link rel="stylesheet" href="stylesheets/home.css">
+<script src="javascripts/SpacePix.js"></script>
+</head>
+<body>
+
+<nav class="navbar bg-dark">
+    <div class="container-fluid">
+        <img src="/Images/NASA.png" alt="nasa-logo">
+        <span class="text-white display-4 mb-4 fw-normal">Hello <%= userName %></span>
+        <div class="col-lg-6 col-md-8 mx-auto">
+            <button id="logoutButton" class="btn btn-outline-light btn-lg mb-4 px-5" type="button">Logout</button>
+        </div>
+    </div>
+</nav>
+
+
+<div id="main-page">
+    <div class="bg-image">
+        <section class="py-5 text-center container">
+            <div class="row py-5 mb-3">
+                <div class="col-lg-6 col-md-8 mx-auto">
+                    <h1 class="text-white display-4 mb-4 fw-normal">🌜SpacePix🚀</h1>
+                    <p class="lead text-white fw-bold">Welcome to SpacePix! Here, you can connect with like-minded individual and share your thoughts and ideas by browse images from NASA's website. We encourage you to engage with others by commenting on their posts and starting your own discussions. Whether you're a space enthusiast or just looking for a new online community, we hope you'll find something of interest here. Thank you for joining us !</p>
+                </div>
+            </div>
+            <div class="row justify-content-center py-5">
+              <span class="datepicker-toggle">
+                 <span class="datepicker-toggle-button"></span>
+                    <label class="form-label lead text-white fw-bold" for="date">Choose date to display your feed : </label>
+                  <input type="date" id="date" class="datepicker-input">
+              </span>
+            </div>
+            <div class="row py-5">
+                <div class="col-lg-6 col-md-8 mx-auto">
+                    <button id="loadButton" class="btn btn-outline-light btn-lg mb-4 px-5" type="button">Load</button>
+                </div>
+            </div>
+        </section>
+
+        <div id="feed" class="container justify-content-center py-5 text-center"></div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade modal-xl" id="Comments" data-bs-backdrop="static" tabindex="-1"  aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" >Comments</h1>
+                </div>
+                <div class="modal-body">
+                    <div class="row d-flex justify-content-center">
+                        <div class="col-md-8 col-lg-10">
+                            <div class="card shadow-0 border" style="background-color: #f0f2f5;">
+                                <div id="commentBody" class="card-body p-4">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="closeCommentsButton" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-square-text-fill" viewBox="0 0 16 16">
+                <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.5a1 1 0 0 0-.8.4l-1.9 2.533a1 1 0 0 1-1.6 0L5.3 12.4a1 1 0 0 0-.8-.4H2a2 2 0 0 1-2-2V2zm3.5 1a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9zm0 2.5a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9zm0 2.5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5z"/>
+            </svg>
+            <strong class="me-auto"> Notification</strong>
+        </div>
+        <div id="toastContent" class="toast-body"></div>
+    </div>
+</div>
+
+<div id="errorMessage" class="container justify-content-center py-5 text-center" style="display: none">
+    <h1 id="errorCode"></h1>
+    <h2 id="errorContent"></h2>
+    <h3 >Try reload the page..</h3>
+</div>
+
+<%- include('includes/end.ejs') %>

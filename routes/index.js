@@ -1,12 +1,10 @@
 var express = require('express');
 var router = express.Router();
+const db = require('../models');
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index',{
-    completed : false,
-    message : ""
-  });
-});
+const loginController = require("../controllers/login");
+
+router.get('/', loginController.mainPage);
+router.post('/user-login', loginController.userLogin);
 
 module.exports = router;
