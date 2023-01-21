@@ -4,3 +4,8 @@ exports.homePage = (req, res) => {
         userName: req.session.userName
     });
 };
+
+exports.userLogout = (req, res) => {
+    req.session.isConnected = false;
+    res.redirect('/');
+};

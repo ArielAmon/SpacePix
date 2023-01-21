@@ -6,4 +6,8 @@ const homeController = require("../controllers/home");
 
 router.get('/', homeController.homePage);
 
+router.get('/logout', homeController.userLogout);
+
+
+
 module.exports = router;

@@ -16,7 +16,7 @@
         if (response.status >= 200 && response.status < 300) {
             return Promise.resolve(response)
         } else {
-            document.getElementById("errorCode").innerText = `Error : ${response.status} - `;
+                document.getElementById("errorCode").innerText = `Error : ${response.status} - `;
             return Promise.reject(response);
         }
     }
@@ -118,81 +118,12 @@
         const commentsList = document.getElementById("commentBody");
         const closeCommentsBtn = document.getElementById("closeCommentsButton");
         const imageDate = event.target.title;
-        const timer = setInterval (updateComments,15000);
+        //const timer = setInterval (updateComments,15000);
 
         // Invoked function to fetch all comments from server as comment button of image has been clicked.
         (()=> {
             getCommentsFromServer();
         })();
-
-        // AJAX function to update the comments feed every 15 seconds. All commnets presented are the real-time
-        // comments saved in the server.
-        async function updateComments(){
-            try {
-                const comments = await fetch(`/comments/getImageComments/?date=${imageDate}`);
-                const commentArray = await comments.json();
-                const clientNumOfComments = commentsList.childElementCount - 1;
-                const serverNumOfComments = commentArray.imageComments.length;
-
-                function deletePermition (i) {
-                    if (commentArray.imageComments[i].username === username ) {
-                        if(!document.getElementById(`comment-${i}`).contains(document.getElementById(`deleteCommentButton-${i}`))){
-                            const comment = document.getElementById(`comment-${i}`).querySelector('.card-body');
-                            comment.insertAdjacentHTML('beforeend', html.makeDeleteButton(i));
-                            document.getElementById(`deleteCommentButton-${i}`).addEventListener('click', handleDeletePost);
-                        }
-                    }
-                    else {
-                        if(document.getElementById(`comment-${i}`).contains(document.getElementById(`deleteCommentButton-${i}`)))
-                            document.getElementById(`deleteCommentButton-${i}`).remove()
-                    }
-                }
-
-                // if there are same amount of comments at server and user , replace user comment according to server comment .
-                function replaceComments (limit) {
-                    for(let i = 0 ; i <  limit ; i++){
-                        const data = document.getElementById(`comment-${i}`).querySelector('.card-body').children;
-                        data[0].innerText = commentArray.imageComments[i].username;
-                        data[1].innerText = commentArray.imageComments[i].userComment;
-                        deletePermition(i);
-
-                    }
-                }
-                // if there are new comments at the server, adding them to the content feed.
-                function updateCommentFeed(lower, operation){
-                    if (operation === "add") {
-                        let lastComment;
-                        for (let i = lower; i < serverNumOfComments; i++) {
-                            if(i === 0 )
-                                commentsList.insertAdjacentHTML('afterbegin', html.makeComment(commentArray.imageComments[i], i));
-                            else{
-                                lastComment = document.getElementById(`comment-${i-1}`);
-                                lastComment.insertAdjacentHTML('afterend', html.makeComment(commentArray.imageComments[i], i));
-                                deletePermition(i);
-                            }
-                        }
-                    } else { // if there are comments that has been deleted at server, deleting them from content feed.
-                        for (let i = lower; i < clientNumOfComments; i++) {
-                            document.getElementById(`comment-${i}`).remove()
-                        }
-                    }
-                }
-
-                if (clientNumOfComments === serverNumOfComments){
-                    replaceComments(clientNumOfComments);
-                }
-                else {
-                    let lower = Math.min(clientNumOfComments, serverNumOfComments);
-                    const operation = serverNumOfComments > clientNumOfComments ? "add" : "delete";
-
-                    replaceComments(lower);
-                    updateCommentFeed(lower, operation);
-                }
-
-            }
-            catch (error) {console.error(error);}
-
-        }
 
         // Function to receive all comments of given image date.
         function getCommentsFromServer () {
@@ -215,65 +146,8 @@
             })
         }
 
-        // Function to handle new user`s post. updating both Dom and server.
-        function handlePost() {
-            const currUserComment = document.getElementById("commentArea").value;
-            document.getElementById("commentArea").value = '';
-            const commentIndex = commentsList.childElementCount - 1;
-            const elem = document.getElementById("commentSection")
-            elem.insertAdjacentHTML('beforebegin',html.makeComment({username : username, userComment : currUserComment},commentIndex))
-            const comment = document.getElementById(`comment-${commentIndex}`).querySelector('.card-body');
-            comment.insertAdjacentHTML('beforeend',html.makeDeleteButton(commentIndex));
-            document.getElementById(`deleteCommentButton-${commentIndex}`).addEventListener('click',handleDeletePost);
-            fetch("/comments/addImageComment",{
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({ date : imageDate, commentator : username, comment : currUserComment})
-            })
-                .then(status)
-                .then(json)
-                .then(function (data) {
-                    utilFuncs.informUser(data.message);
-                })
-                .catch(function (error) {
-                    console.error(error);
-                });
-        }
 
-        // Function to handle user`s deleting a post (only his own). updating both Dom and server.
-        function handleDeletePost(event){
-            const indexToDelete = event.target.id.split('-')[1];
-            const comment = document.getElementById(`comment-${indexToDelete}`).querySelector('.card-body').children[1].innerHTML;
-            fetch("/comments/deleteComment",{
-                method: "DELETE",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({ date : imageDate, deleteComment : comment})
-            }).then(status)
-                .then(json)
-                .then(function (data) {
-                    utilFuncs.informUser(data.message);
-                }).catch(function (error) {
-                utilFuncs.handleError(error);
-            })
-            document.getElementById(`comment-${indexToDelete}`).remove();
-            let comments = commentsList.children;
-            let arr = [...comments]
-            arr.pop();
-            arr.forEach((commentElem, index)=>{
-                commentElem.id = `comment-${index}`;
-                const elem = commentElem.querySelector('.card-body').children;
-                let newArr = [...elem];
-                if (newArr[2])
-                    newArr[2].id = `deleteCommentButton-${index}`;
-            });
-        }
 
-        closeCommentsBtn.addEventListener('click', ()=>{
-            clearInterval(timer);
-            while (commentsList.firstChild) {
-                commentsList.removeChild(commentsList.firstChild);
-            }
-        });
 
     }
 
@@ -287,25 +161,6 @@
         const html = createHtml();
         const utilFuncs = utilities();
         const imageIncrease = 3 ;
-        let imageDates = [];
-
-        // Function to save at the server that an image has been loaded once.
-        function addImagesToServer(keyVal){
-            fetch("/comments/addImageKey",{
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({keys :`${keyVal}`})
-            })
-                .then(status)
-                .then(json)
-                .then(function (data){
-                    utilFuncs.informUser(data.message);
-                })
-                .catch(function (error) {
-                    console.error(error);
-                });
-            imageDates = []
-        }
 
         // Function to calculate the differences between date
         function calcRangedDate (date){
@@ -330,13 +185,11 @@
                 .then(function (data) {
                     const feedContent = document.getElementById("feed");
                     data.slice().reverse().forEach((image)=>{
-                        imageDates.push(image.date);
                         const newDiv = document.createElement("div");
                         newDiv.innerHTML = html.makeImageCard(image);
                         feedContent.appendChild(newDiv);
                         document.getElementById(`commentButton-${image.date}`).addEventListener('click', commentsController);
                     });
-                    addImagesToServer(imageDates);
                 }).catch(async function (error) {
                 const data = await error.json();
                 if (error.status === 400)
@@ -365,10 +218,6 @@
             return [day, month, year];
         }
 
-        const checkName = (nameToCheck) =>{
-            return (/^[A-Za-z0-9]+$/.test(nameToCheck) && (nameToCheck.length <= 24))
-        }
-
         const removeChildElements = (elem) =>{
             while (elem.firstChild) {
                 elem.removeChild(elem.firstChild);
@@ -393,7 +242,6 @@
 
         return{
             dateFormater : getFormatedDate,
-            validateName : checkName,
             deleteContent : removeChildElements,
             informUser : presentServerResponse,
             handleError : displayApiError,
@@ -425,8 +273,6 @@
         nasaApi.getNasaContent(utilFuncs.dateFormater(currDate));
         window.addEventListener("scroll", handleInfiniteScroll);
 
-
-
         loadBtn.addEventListener('click', ()=>{
             loadBtn.disabled = true;
             setTimeout(() => {
@@ -436,8 +282,7 @@
             currDate = dateInput.valueAsDate;
             nasaApi.getNasaContent(utilFuncs.dateFormater(currDate));
         })
+
     });
-
-
 
 })();

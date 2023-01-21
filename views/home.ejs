@@ -8,12 +8,11 @@
     <div class="container-fluid">
         <img src="/Images/NASA.png" alt="nasa-logo">
         <span class="text-white display-4 mb-4 fw-normal">Hello <%= userName %></span>
-        <div class="col-lg-6 col-md-8 mx-auto">
-            <button id="logoutButton" class="btn btn-outline-light btn-lg mb-4 px-5" type="button">Logout</button>
-        </div>
+        <form action="/home/logout" method="get">
+            <button type="submit" class="btn btn-outline-light btn-lg mb-4 px-5" type="button">Logout</button>
+        </form>
     </div>
 </nav>
-
 
 <div id="main-page">
     <div class="bg-image">
