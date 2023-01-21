@@ -7,9 +7,9 @@
 <nav class="navbar bg-dark">
     <div class="container-fluid">
         <img src="/Images/NASA.png" alt="nasa-logo">
-        <span class="text-white display-4 mb-4 fw-normal">Hello <%= userName %></span>
+        <span id="welcomeTitle" data-user="<%= userName %>" class="text-white display-4 mb-4 fw-normal">Hello <%= userName %></span>
         <form action="/home/logout" method="get">
-            <button type="submit" class="btn btn-outline-light btn-lg mb-4 px-5" type="button">Logout</button>
+            <button type="submit" class="btn btn-outline-light btn-lg mb-4 px-5" >Logout</button>
         </form>
     </div>
 </nav>
@@ -38,6 +38,11 @@
         </section>
 
         <div id="feed" class="container justify-content-center py-5 text-center"></div>
+
+        <div id="errorMessage" class="container justify-content-center py-5 text-center" style="display: none">
+            <span id="errorContent" class="text-white display-4 mb-4 fw-normal"></span>
+            <h3 class="text-white display-4 mb-4 fw-normal">Try again and reload the page..</h3>
+        </div>
     </div>
 
     <!-- Modal -->
@@ -52,7 +57,9 @@
                         <div class="col-md-8 col-lg-10">
                             <div class="card shadow-0 border" style="background-color: #f0f2f5;">
                                 <div id="commentBody" class="card-body p-4">
-
+                                    <div class="alert alert-success" role="alert" style="display: none">
+                                       <p id="serverError"></p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -79,10 +86,6 @@
     </div>
 </div>
 
-<div id="errorMessage" class="container justify-content-center py-5 text-center" style="display: none">
-    <h1 id="errorCode"></h1>
-    <h2 id="errorContent"></h2>
-    <h3 >Try reload the page..</h3>
-</div>
+
 
 <%- include('includes/end.ejs') %>

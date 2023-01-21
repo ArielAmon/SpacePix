@@ -54,15 +54,16 @@ app.use('/home',isLoggedIn ,homeRouter);
 app.use('/', isNotLoggedIn,indexRouter);
 app.use('/users', isNotLoggedIn,usersRouter);
 
-app.get('/DBtest', (req, res) => {
-    return db.User.findAll()
-        .then((users) => res.send(users))
-        .catch((err) => {
-            console.log('There was an error querying contacts', JSON.stringify(err))
-            err.error = 1; // some error code for client side
-            return res.send(err)
-        });
-});
+
+// app.get('/DBcomments', (req, res) => {
+//     return db.Comments.findAll()
+//         .then((users) => res.send(users))
+//         .catch((err) => {
+//             console.log('There was an error querying contacts', JSON.stringify(err))
+//             err.error = 1; // some error code for client side
+//             return res.send(err)
+//         });
+// });
 
 // // catch 404 and forward to error handler
 // app.use(function(req, res, next) {

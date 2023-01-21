@@ -16,8 +16,14 @@
         if (response.status >= 200 && response.status < 300) {
             return Promise.resolve(response)
         } else {
-                document.getElementById("errorCode").innerText = `Error : ${response.status} - `;
-            return Promise.reject(response);
+            return response.json().then((data) =>{
+                if (!data.msg){
+                    return Promise.reject(new Error(`${data.error.code} ${data.error.message} `))
+                }
+                else {
+                    return Promise.reject(new Error(`${data.code} ${data.msg} `))
+                }
+            })
         }
     }
 
@@ -61,11 +67,11 @@
             return html;
         }
 
-        const createComment = (data, index) =>{
-            return `<div id="comment-${index}" class="card mb-4">
+        const createComment = (data) =>{
+            return `<div id="comment-${data.id}" class="card mb-4">
                         <div class="card-body">
-                            <p id="commentatorName" class="fw-bold">${data.username}</p>
-                            <p id="commentatorText">${data.userComment}</p>
+                            <p id="commentatorName" class="fw-bold">${data.userName}</p>
+                            <p id="commentatorText">${data.comment}</p>
                         </div>
                     </div>\n`
         }
@@ -115,8 +121,10 @@
         const html = createHtml();
         const utilFuncs = utilities();
 
+        const userName = document.getElementById("welcomeTitle").dataset.user;
         const commentsList = document.getElementById("commentBody");
         const closeCommentsBtn = document.getElementById("closeCommentsButton");
+        const serverError = document.getElementById("serverError");
         const imageDate = event.target.title;
         //const timer = setInterval (updateComments,15000);
 
@@ -127,27 +135,65 @@
 
         // Function to receive all comments of given image date.
         function getCommentsFromServer () {
-            fetch(`/comments/getImageComments/?date=${imageDate}`)
+            fetch(`/home/getImageComments/?date=${imageDate}`)
                 .then(status)
                 .then(json)
-                .then(function (data) {
-                    data.imageComments.forEach((commentData, index)=>{
-                        commentsList.insertAdjacentHTML('beforeend',html.makeComment(commentData, index));
-                        if (commentData.username === username){
-                            const comment = document.getElementById(`comment-${index}`).querySelector('.card-body');
-                            comment.insertAdjacentHTML('beforeend',html.makeDeleteButton(index));
-                            document.getElementById(`deleteCommentButton-${index}`).addEventListener('click',handleDeletePost);
+                .then( (data) =>{
+                    console.log(data, "and user name is", userName);
+                    data.forEach((commentData)=>{
+                        commentsList.insertAdjacentHTML('beforeend',html.makeComment(commentData));
+                        if (commentData.userName === userName){
+                            const comment = document.getElementById(`comment-${commentData.id}`).querySelector('.card-body');
+                            comment.insertAdjacentHTML('beforeend',html.makeDeleteButton(commentData.id));
+                            //document.getElementById(`deleteCommentButton-${commentData.id}`).addEventListener('click',handleDeletePost);
                         }
                     })
                     commentsList.insertAdjacentHTML('beforeend',html.makePostSection());
                     document.getElementById("postCommentButton").addEventListener('click', handlePost);
-                }).catch(function (error) {
+                }).catch( (error) =>{
                 console.error(error);
+                displayServerError(error);
             })
         }
 
+        // Function to handle new user`s post. updating both Dom and server.
+        function handlePost() {
+            const currUserComment = document.getElementById("commentArea").value;
+            document.getElementById("commentArea").value = '';
+            console.log("The data is :",imageDate, userName, currUserComment)
+            fetch("/home/addImageComment",{
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ imageID : imageDate, user : userName, comment : currUserComment})
+            })
+                .then(status)
+                .then(json)
+                .then((data) =>{
+                    const elem = document.getElementById("commentSection");
+                    elem.insertAdjacentHTML('beforebegin',html.makeComment(data));
+                    const comment = document.getElementById(`comment-${data.id}`).querySelector('.card-body');
+                    comment.insertAdjacentHTML('beforeend',html.makeDeleteButton(data.id));
+                    //document.getElementById(`deleteCommentButton-${data.id}`).addEventListener('click',handleDeletePost);
+                })
+                .catch((error)=> {
+                    console.error(error);
+                    displayServerError(error);
+                });
+        }
 
+        function displayServerError(error){
+            utilFuncs.deleteContent(commentsList);
+            serverError.style.display = "block";
+            serverError.innerText = error;
+        }
 
+        closeCommentsBtn.addEventListener('click', ()=>{
+            //clearInterval(timer);
+            utilFuncs.deleteContent(commentsList);
+            // while (commentsList.firstChild) {
+            //     commentsList.removeChild(commentsList.firstChild);
+            // }
+        });
 
     }
 
@@ -169,8 +215,7 @@
             const day = date[0];
             const currentDate = new Date(year, month, day);
             currentDate.setDate(currentDate.getDate() - imageIncrease);
-            const diffDate = [currentDate.getDate(), currentDate.getMonth() + 1, currentDate.getFullYear()];
-            return diffDate;
+            return [currentDate.getDate(), currentDate.getMonth() + 1, currentDate.getFullYear()];
 
         }
 
@@ -190,12 +235,8 @@
                         feedContent.appendChild(newDiv);
                         document.getElementById(`commentButton-${image.date}`).addEventListener('click', commentsController);
                     });
-                }).catch(async function (error) {
-                const data = await error.json();
-                if (error.status === 400)
-                    utilFuncs.handleError(data.code, data.msg);
-                else
-                    utilFuncs.handleError(data.error.code ,data.error.message );
+                }).catch((error) =>{
+                utilFuncs.handleError(error);
             })
         }
 
@@ -231,12 +272,11 @@
             setTimeout( toast.show(),2000);
         }
 
-        const displayApiError = (code, message) =>{
+        const displayApiError = (message) =>{
             const elem = document.getElementById("errorMessage");
-            const main = document.getElementById("main-page");
-            main.style.display = "none";
+            const feed = document.getElementById("feed");
+            feed.style.display = "none";
             elem.style.display = "block";
-            document.getElementById("errorCode").innerText += code;
             document.getElementById("errorContent").innerText = message;
         }
 
