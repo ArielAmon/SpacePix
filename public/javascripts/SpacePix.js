@@ -124,7 +124,8 @@
         const userName = document.getElementById("welcomeTitle").dataset.user;
         const commentsList = document.getElementById("commentBody");
         const closeCommentsBtn = document.getElementById("closeCommentsButton");
-        const serverError = document.getElementById("serverError");
+        const serverErrorElem = document.getElementById("errorMessage");
+        const serverError = document.getElementById("errorContent");
         const imageDate = event.target.title;
         //const timer = setInterval (updateComments,15000);
 
@@ -145,7 +146,7 @@
                         if (commentData.userName === userName){
                             const comment = document.getElementById(`comment-${commentData.id}`).querySelector('.card-body');
                             comment.insertAdjacentHTML('beforeend',html.makeDeleteButton(commentData.id));
-                            //document.getElementById(`deleteCommentButton-${commentData.id}`).addEventListener('click',handleDeletePost);
+                            document.getElementById(`deleteCommentButton-${commentData.id}`).addEventListener('click',handleDeletePost);
                         }
                     })
                     commentsList.insertAdjacentHTML('beforeend',html.makePostSection());
@@ -173,7 +174,7 @@
                     elem.insertAdjacentHTML('beforebegin',html.makeComment(data));
                     const comment = document.getElementById(`comment-${data.id}`).querySelector('.card-body');
                     comment.insertAdjacentHTML('beforeend',html.makeDeleteButton(data.id));
-                    //document.getElementById(`deleteCommentButton-${data.id}`).addEventListener('click',handleDeletePost);
+                    document.getElementById(`deleteCommentButton-${data.id}`).addEventListener('click',handleDeletePost);
                 })
                 .catch((error)=> {
                     console.error(error);
@@ -181,9 +182,26 @@
                 });
         }
 
+        // Function to handle user`s deleting a post (only his own). updating both Dom and server.
+        function handleDeletePost(event){
+            const indexToDelete = event.target.id.split('-')[1];
+            fetch("/home/deleteComment",{
+                method: "DELETE",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ id : indexToDelete})
+            }).then(status)
+                .then(json)
+                .then((data) =>{
+                    if(data) document.getElementById(`comment-${indexToDelete}`).remove();
+                }).catch( (error) =>{
+                console.error(error);
+                displayServerError(error);
+            })
+        }
+
         function displayServerError(error){
             utilFuncs.deleteContent(commentsList);
-            serverError.style.display = "block";
+            serverErrorElem.style.display = 'block';
             serverError.innerText = error;
         }
 

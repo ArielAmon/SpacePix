@@ -2,31 +2,45 @@ const Cookies = require('cookies');
 const db = require('../models'); //contain the Contact model, which is accessible via db.Contact
 const keys = ['keyboard cat']
 
-exports.startRegistration = (req, res) => {
+function getCookiesData(req, res){
     const cookies = new Cookies(req, res, {keys : keys});
     let email = cookies.get('email',{signed : true});
     let firstName = cookies.get('firsName',{signed : true});
     let lastName = cookies.get('lastName',{signed : true});
-    if(!email || !firstName || !lastName){
-        email = '';
-        firstName = '';
-        lastName = '';
+    return [email,firstName,lastName];
+}
+
+function areAllUndefined(arr){
+    return arr.includes(undefined) || arr.includes(null);
+}
+
+exports.startRegistration = (req, res) => {
+    // const cookies = new Cookies(req, res, {keys : keys});
+    // let email = cookies.get('email',{signed : true});
+    // let firstName = cookies.get('firsName',{signed : true});
+    // let lastName = cookies.get('lastName',{signed : true});
+    const data = getCookiesData(req, res);
+    if(!areAllUndefined(data)){
+        data.forEach((elem)=>{
+            elem = '';
+        })
     }
     res.render('register',{
         error: "",
         hasError : false,
-        userEmail : email,
-        userFirstName : firstName,
-        userLastName : lastName
+        userEmail : data[0],
+        userFirstName : data[1],
+        userLastName : data[2]
     });
 };
 
 exports.choosePassword = (req, res) => {
-    const cookies = new Cookies(req, res, {keys : keys});
-    let email = cookies.get('email',{signed : true});
-    let firstName = cookies.get('firsName',{signed : true});
-    let lastName = cookies.get('lastName',{signed : true});
-    if(!email || !firstName || !lastName){
+    // const cookies = new Cookies(req, res, {keys : keys});
+    // let email = cookies.get('email',{signed : true});
+    // let firstName = cookies.get('firsName',{signed : true});
+    // let lastName = cookies.get('lastName',{signed : true});
+    const data = getCookiesData(req, res);
+    if(areAllUndefined(data)){
         res.redirect('/users/register');
     }else {
         res.render('register-password',{
@@ -60,21 +74,26 @@ exports.addUserContact = (req, res) => {
             }
         }).catch((err) => {
         console.log('error creating a new user in DB');
-        return res.status(400).send(err)
+        //return res.status(400).send(err)
+        res.render('register', {
+            hasError: true,
+            error: err,
+            userEmail : '',
+            userFirstName : '',
+            userLastName : ''
+        });
     });
 
 
 }
 
 exports.addUserPassword = (req, res) => {
-    const cookies = new Cookies(req, res, {keys : keys});
-    let email = cookies.get('email',{signed : true});
-    let firstName = cookies.get('firsName',{signed : true});
-    let lastName = cookies.get('lastName',{signed : true});
-    if(!email || !firstName || !lastName){
+    const data = getCookiesData(req, res);
+    if(areAllUndefined(data)){
         res.render('index',{
-            completed : true,
-            message : "Registration expired ! please start again !"
+            completed : false,
+            hasError : true,
+            message : "Registration expired ! please start again"
         });
     }else{
         const { password, confirmPassword} = req.body;
@@ -85,17 +104,22 @@ exports.addUserPassword = (req, res) => {
             });
             return;
         }
-        db.User.create({ email:email, firstName:firstName, lastName:lastName, password:password})
+        db.User.create({ email:data[0], firstName:data[1], lastName:data[2], password:password})
             .then((contact) => {
                 console.log(contact);
                 res.render('index',{
+                    message: "Congratulations ! You are now registered 🥳",
                     completed : true,
-                    message : "Congratulations ! You are now registered 🥳"
+                    hasError : false,
                 });
             })
             .catch((err) => {
                 console.log('error creating a new user in DB');
-                return res.status(400).send(err)
+                //return res.status(400).send(err)
+                res.render('register-password', {
+                    hasError : true,
+                    error: err,
+                });
             });
     }
 };

@@ -1,7 +1,6 @@
 
 <%- include('includes/head.ejs') %>
 <link rel="stylesheet" href="/stylesheets/register.css">
-<!--<script src="javascripts/login.js"></script>-->
 </head>
 
 <body>
@@ -16,6 +15,13 @@
 
                             <% if (completed) { %>
                                 <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <h4><strong><%= message %></strong></h4>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            <% } %>
+
+                            <% if (hasError) { %>
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                     <h4><strong><%= message %></strong></h4>
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>

@@ -40,13 +40,14 @@ exports.addComment = (req, res) => {
 }
 
 exports.deleteComment = (req, res) => {
-    const id = req.query.id;
+    const {id} = req.body;
+    console.log('image to delete', id);
     db.Comments.destroy({ where: { id: id } })
         .then((count) =>{
             console.log(`deleted row(s): ${count}`);
             res.status(202).json(count);
         }).catch((err) => {
         console.log('error deleting the comment', err);
-        return res.status(404).send(err)
+        return res.status(404).json(err);
     });
 };
