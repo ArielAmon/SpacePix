@@ -10,18 +10,26 @@ exports.mainPage = (req, res) => {
 
 exports.userLogin = (req, res) => {
     const { userEmail, userPassword } = req.body;
-    db.User.findOne({ where: { email: userEmail, password: userPassword} })
-        .then((data) =>{
-            if (data) {
-                req.session.userName = `${data.firstName} ${data.lastName}`;
-                req.session.isConnected = true;
-                res.redirect('/home');
-            } else {
+    db.User.findOne({ where: { email: userEmail.toLowerCase()} })
+        .then(async function (user) {
+            if(!user){
                 res.render('index',{
                     message: "Sorry, User doesn't exist",
                     completed : false,
                     hasError : true
                 });
+            }
+            else if(!await user.validPassword(userPassword)){
+                res.render('index',{
+                    message: "Wrong password! try again",
+                    completed : false,
+                    hasError : true
+                });
+            }
+            else{
+                req.session.userName = `${user.firstName} ${user.lastName}`;
+                req.session.isConnected = true;
+                res.redirect('/home');
             }
         }).catch((err) => {
         // console.log('error login', err);

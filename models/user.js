@@ -1,4 +1,6 @@
 'use strict';
+const bcrypt = require('bcrypt');
+
 const {
   Model
 } = require('sequelize');
@@ -35,5 +37,24 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'User',
   });
+
+  User.addHook ('beforeCreate', async (user, options) => {
+
+    if(user.email){
+      user.email = user.email.toLowerCase();
+    }
+
+    if (user.password) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(user.password, salt);
+    }
+  });
+
+  User.prototype.validPassword = async function(password) {
+    return await bcrypt.compare(password, this.password);
+  }
+
+
+
   return User;
 };

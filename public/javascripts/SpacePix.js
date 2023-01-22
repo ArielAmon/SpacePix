@@ -298,11 +298,19 @@
             document.getElementById("errorContent").innerText = message;
         }
 
+        const disableElem = (elem, delay) =>{
+            elem.disabled = true;
+            setTimeout(() => {
+                elem.disabled = false;
+            }, delay)
+        }
+
         return{
             dateFormater : getFormatedDate,
             deleteContent : removeChildElements,
             informUser : presentServerResponse,
             handleError : displayApiError,
+            disableButton : disableElem,
         }
 
     }
@@ -315,32 +323,44 @@
         let currDate = new Date();
         dateInput.valueAsDate = currDate;
         const loadBtn = document.getElementById("loadButton");
+        const moreBtn = document.getElementById("moreButton");
         const feedContent = document.getElementById("feed");
+        const loadContentElem = document.getElementById("loading-1");
 
         const nasaApi = handleNasaApi();
         const utilFuncs = utilities();
 
-        const handleInfiniteScroll = () => {
-            const endOfPage = window.innerHeight + window.pageYOffset >= document.body.offsetHeight;
-            if (endOfPage) {
-                currDate.setDate(currDate.getDate() - 4);
-                nasaApi.getNasaContent(utilFuncs.dateFormater(currDate));
-            }
-        };
-
-        nasaApi.getNasaContent(utilFuncs.dateFormater(currDate));
-        window.addEventListener("scroll", handleInfiniteScroll);
-
-        loadBtn.addEventListener('click', ()=>{
-            loadBtn.disabled = true;
+        const loadNewContent = (loadingTime) => {
+            feedContent.style.display = 'none';
+            loadContentElem.style.display = 'block';
+            utilFuncs.disableButton(moreBtn,loadingTime);
+            utilFuncs.disableButton(loadBtn,loadingTime);
             setTimeout(() => {
-                loadBtn.disabled = false;
-            }, 2000)
-            utilFuncs.deleteContent(feedContent);
-            currDate = dateInput.valueAsDate;
+                feedContent.style.display = 'block';
+                loadContentElem.style.display = 'none';
+                nasaApi.getNasaContent(utilFuncs.dateFormater(currDate));
+            }, loadingTime)
+        }
+
+        (()=> {
+            loadNewContent(5000);
+        })();
+
+        //nasaApi.getNasaContent(utilFuncs.dateFormater(currDate));
+
+        moreBtn.addEventListener('click',()=>{
+            utilFuncs.disableButton(moreBtn);
+            currDate.setDate(currDate.getDate() - 4);
             nasaApi.getNasaContent(utilFuncs.dateFormater(currDate));
         })
 
+        loadBtn.addEventListener('click', ()=>{
+            utilFuncs.deleteContent(feedContent);
+            currDate = dateInput.valueAsDate;
+            //utilFuncs.disableButton(loadBtn);
+            //nasaApi.getNasaContent(utilFuncs.dateFormater(currDate));
+            loadNewContent(5000);
+        })
     });
 
 })();
