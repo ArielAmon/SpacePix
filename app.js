@@ -32,12 +32,19 @@ app.use(session({
     cookie: {maxAge: 10*60*1000 } // milliseconds!
 }));
 
+function nocache(req, res, next) {
+    res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0,max-age=0,s-maxage=0');
+    next();
+}
+
 function isLoggedIn(req, res, next) {
     console.log("logged in")
     if (req.session.isConnected) {
         next();
     } else {
-        res.redirect('/');
+        //res.redirect('/');
+        let obj = {code:401,msg:"http://localhost:3000/"};
+        res.status(401).json(obj);
     }
 }
 
@@ -50,9 +57,9 @@ function isNotLoggedIn(req, res, next) {
     }
 }
 
-app.use('/home',isLoggedIn ,homeRouter);
-app.use('/', isNotLoggedIn,indexRouter);
-app.use('/users', isNotLoggedIn,usersRouter);
+app.use('/home',nocache, isLoggedIn ,homeRouter);
+app.use('/',nocache, isNotLoggedIn,indexRouter);
+app.use('/users',nocache, isNotLoggedIn,usersRouter);
 
 
 // app.get('/DBcomments', (req, res) => {

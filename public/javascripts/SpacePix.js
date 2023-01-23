@@ -8,7 +8,7 @@
 
 
 (()=>{
-    let username ;
+
     const keyAPI = "pY612lrnDwt556WmaIYjq5xWTkbOQaB5LAdsbrPi";
     const nasaUrl = "https://api.nasa.gov/planetary/apod";
 
@@ -17,6 +17,7 @@
             return Promise.resolve(response)
         } else {
             return response.json().then((data) =>{
+
                 if (!data.msg){
                     return Promise.reject(new Error(`${data.error.code} ${data.error.message} `))
                 }
@@ -121,11 +122,12 @@
         const html = createHtml();
         const utilFuncs = utilities();
 
+        const id = document.getElementById("welcomeTitle").dataset.userId;
         const userName = document.getElementById("welcomeTitle").dataset.user;
         const commentsList = document.getElementById("commentBody");
         const closeCommentsBtn = document.getElementById("closeCommentsButton");
-        const serverErrorElem = document.getElementById("errorMessage");
-        const serverError = document.getElementById("errorContent");
+        const serverErrorElem = document.getElementById("serverError");
+        const serverError = document.getElementById("serverErrorContent");
         const imageDate = event.target.title;
         //const timer = setInterval (updateComments,15000);
 
@@ -139,11 +141,11 @@
             fetch(`/home/getImageComments/?date=${imageDate}`)
                 .then(status)
                 .then(json)
-                .then( (data) =>{
-                    console.log(data, "and user name is", userName);
+                .then((data) =>{
+                    console.log(data, "and user name is", id);
                     data.forEach((commentData)=>{
                         commentsList.insertAdjacentHTML('beforeend',html.makeComment(commentData));
-                        if (commentData.userName === userName){
+                        if (commentData.userID === Number(id)){
                             const comment = document.getElementById(`comment-${commentData.id}`).querySelector('.card-body');
                             comment.insertAdjacentHTML('beforeend',html.makeDeleteButton(commentData.id));
                             document.getElementById(`deleteCommentButton-${commentData.id}`).addEventListener('click',handleDeletePost);
@@ -152,7 +154,6 @@
                     commentsList.insertAdjacentHTML('beforeend',html.makePostSection());
                     document.getElementById("postCommentButton").addEventListener('click', handlePost);
                 }).catch( (error) =>{
-                console.error(error);
                 displayServerError(error);
             })
         }
@@ -161,7 +162,7 @@
         function handlePost() {
             const currUserComment = document.getElementById("commentArea").value;
             document.getElementById("commentArea").value = '';
-            console.log("The data is :",imageDate, userName, currUserComment)
+            console.log("The data is :",imageDate, userName,id, currUserComment)
             fetch("/home/addImageComment",{
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
@@ -200,9 +201,16 @@
         }
 
         function displayServerError(error){
+            console.log(`"${error.message }"`, typeof (error), error.message.split(' '));
             utilFuncs.deleteContent(commentsList);
             serverErrorElem.style.display = 'block';
-            serverError.innerText = error;
+            serverError.innerText = "ERORR you are not connected";
+            setTimeout(()=>{
+                serverErrorElem.style.display = 'none';
+                if(error.message.split(' ')[1] === "http://localhost:3000/"){
+                    window.location.href = error.message.split(' ')[1];
+                }
+            },3000)
         }
 
         closeCommentsBtn.addEventListener('click', ()=>{

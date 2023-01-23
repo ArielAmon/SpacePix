@@ -3,7 +3,8 @@ const db = require('../models');
 
 exports.homePage = (req, res) => {
     res.render('home',{
-        userName: req.session.userName
+        userName: req.session.userName,
+        userID: req.session.userID,
     });
 };
 
@@ -27,8 +28,8 @@ exports.getImageComments = (req, res) => {
 
 exports.addComment = (req, res) => {
     const {imageID, user, comment} = req.body;
-    console.log("Data recived",imageID, user, comment);
-    db.Comments.create({ imageID:imageID, userName:user, comment:comment})
+    console.log("Data recived",imageID, user, comment,req.session.userID);
+    db.Comments.create({ imageID:imageID, userName:user, comment:comment, userID:req.session.userID})
         .then((data) => {
             console.log(data);
             res.status(201).json(data);

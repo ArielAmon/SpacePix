@@ -15,10 +15,6 @@ function areAllUndefined(arr){
 }
 
 exports.startRegistration = (req, res) => {
-    // const cookies = new Cookies(req, res, {keys : keys});
-    // let email = cookies.get('email',{signed : true});
-    // let firstName = cookies.get('firsName',{signed : true});
-    // let lastName = cookies.get('lastName',{signed : true});
     const data = getCookiesData(req, res);
     if(!areAllUndefined(data)){
         data.forEach((elem)=>{
@@ -35,10 +31,6 @@ exports.startRegistration = (req, res) => {
 };
 
 exports.choosePassword = (req, res) => {
-    // const cookies = new Cookies(req, res, {keys : keys});
-    // let email = cookies.get('email',{signed : true});
-    // let firstName = cookies.get('firsName',{signed : true});
-    // let lastName = cookies.get('lastName',{signed : true});
     const data = getCookiesData(req, res);
     if(areAllUndefined(data)){
         res.redirect('/users/register');
@@ -48,9 +40,7 @@ exports.choosePassword = (req, res) => {
             hasError : false
         });
     }
-
 };
-
 
 exports.addUserContact = (req, res) => {
     const cookies = new Cookies(req, res, {keys : keys});
@@ -60,7 +50,6 @@ exports.addUserContact = (req, res) => {
 
     db.User.findOne({ where: { email: req.body.userEmail } })
         .then((email) =>{
-            console.log("in the email exist check",email);
             if (!email) {
                 res.redirect('/users/register-password');
             } else {
@@ -83,8 +72,6 @@ exports.addUserContact = (req, res) => {
             userLastName : ''
         });
     });
-
-
 }
 
 exports.addUserPassword = (req, res) => {

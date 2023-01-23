@@ -27,6 +27,8 @@ exports.userLogin = (req, res) => {
                 });
             }
             else{
+                console.log("the user id",user.id)
+                req.session.userID = user.id;
                 req.session.userName = `${user.firstName} ${user.lastName}`;
                 req.session.isConnected = true;
                 res.redirect('/home');

@@ -7,7 +7,7 @@
 <nav class="navbar bg-dark">
     <div class="container-fluid">
         <img src="/Images/NASA.png" alt="nasa-logo">
-        <span id="welcomeTitle" data-user="<%= userName %>" class="text-white display-4 mb-4 fw-normal">Hello <%= userName %></span>
+        <span id="welcomeTitle" data-user-ID="<%= userID %>" data-user="<%= userName %>" class="text-white display-4 mb-4 fw-normal">Hello <%= userName %></span>
         <form action="/home/logout" method="get">
             <button type="submit" class="btn btn-outline-light btn-lg mb-4 px-5" >Logout</button>
         </form>
@@ -71,10 +71,10 @@
                     <div class="row d-flex justify-content-center">
                         <div class="col-md-8 col-lg-10">
                             <div class="card shadow-0 border" style="background-color: #f0f2f5;">
-                                <div id="commentBody" class="card-body p-4">
-                                    <div class="alert alert-danger" role="alert" style="display: none">
-                                       <p id="serverError"></p>
+                                    <div id="serverError" class="alert alert-danger" role="alert" style="display: none">
+                                       <p id="serverErrorContent"></p>
                                     </div>
+                                <div id="commentBody" class="card-body p-4">
                                 </div>
                             </div>
                         </div>

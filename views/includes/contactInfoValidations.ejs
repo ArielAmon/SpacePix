@@ -14,9 +14,14 @@
         }
 
         if(!isValid(nameToCheck)){
-            //if(!document.contains(document.getElementById("formatError")))
             nameElem.insertAdjacentHTML('beforebegin', errorElement());
-            return false
+            setTimeout(() =>{
+              const errorMessages = document.getElementsByClassName("alert alert-danger alert-dismissible fade show");
+                for (let i = 0; i < errorMessages.length; i++) {
+                    errorMessages[i].remove();
+                }
+            },4000)
+            return false;
         }
         return true;
     }
