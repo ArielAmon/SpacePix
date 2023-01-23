@@ -42,9 +42,10 @@ function isLoggedIn(req, res, next) {
     if (req.session.isConnected) {
         next();
     } else {
-        //res.redirect('/');
-        let obj = {code:401,msg:"http://localhost:3000/"};
-        res.status(401).json(obj);
+        res.redirect('/');
+        // let obj = {code:401,msg:"http://localhost:3000"};
+        // res.status(401).json(obj);
+        // try make a modal for all server errors then direct to login
     }
 }
 

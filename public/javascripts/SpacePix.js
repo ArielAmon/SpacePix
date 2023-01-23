@@ -176,9 +176,9 @@
                     const comment = document.getElementById(`comment-${data.id}`).querySelector('.card-body');
                     comment.insertAdjacentHTML('beforeend',html.makeDeleteButton(data.id));
                     document.getElementById(`deleteCommentButton-${data.id}`).addEventListener('click',handleDeletePost);
+                    utilFuncs.disableButton(document.getElementById(`deleteCommentButton-${data.id}`),2500);
                 })
                 .catch((error)=> {
-                    console.error(error);
                     displayServerError(error);
                 });
         }
@@ -195,21 +195,17 @@
                 .then((data) =>{
                     if(data) document.getElementById(`comment-${indexToDelete}`).remove();
                 }).catch( (error) =>{
-                console.error(error);
                 displayServerError(error);
             })
         }
 
         function displayServerError(error){
-            console.log(`"${error.message }"`, typeof (error), error.message.split(' '));
             utilFuncs.deleteContent(commentsList);
             serverErrorElem.style.display = 'block';
-            serverError.innerText = "ERORR you are not connected";
+            serverError.innerText = error.message;
             setTimeout(()=>{
                 serverErrorElem.style.display = 'none';
-                if(error.message.split(' ')[1] === "http://localhost:3000/"){
-                    window.location.href = error.message.split(' ')[1];
-                }
+                window.location.href = "http://localhost:3000";
             },3000)
         }
 
