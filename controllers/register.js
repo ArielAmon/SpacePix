@@ -66,11 +66,9 @@ exports.addUserContact = (req, res) => {
                 });
             }
         }).catch((err) => {
-        console.log('error creating a new user in DB');
-        //return res.status(400).send(err)
         res.render('register', {
             hasError: true,
-            error: err,
+            error: err.errors[0].message,
             userEmail : '',
             userFirstName : '',
             userLastName : ''
@@ -97,7 +95,6 @@ exports.addUserPassword = (req, res) => {
         }
         db.User.create({ email:data[0], firstName:data[1], lastName:data[2], password:password})
             .then((contact) => {
-                console.log(contact);
                 res.render('index',{
                     message: "Congratulations ! You are now registered 🥳",
                     completed : true,
@@ -105,11 +102,12 @@ exports.addUserPassword = (req, res) => {
                 });
             })
             .catch((err) => {
-                console.log('error creating a new user in DB');
-                //return res.status(400).send(err)
-                res.render('register-password', {
-                    hasError : true,
-                    error: err,
+                res.render('register', {
+                    hasError: true,
+                    error: err.errors[0].message,
+                    userEmail : '',
+                    userFirstName : '',
+                    userLastName : ''
                 });
             });
     }

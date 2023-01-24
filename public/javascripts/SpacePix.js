@@ -194,11 +194,10 @@
         }
 
         function displayServerError(error){
-            if (!document.cookie){
-                console.log("there is no cookies!!")
-                window.location.href = "http://localhost:3000";
-            }
-            else {
+            // if (!document.cookie){
+            //     window.location.href = "http://localhost:3000";
+            // }
+            // else {
                 utilFuncs.deleteContent(commentsList);
                 serverErrorElem.style.display = 'block';
                 serverError.innerText = error.message;
@@ -206,15 +205,11 @@
                     serverErrorElem.style.display = 'none';
                     window.location.href = "http://localhost:3000/home";
                 },7000)
-            }
+            //}
         }
 
         closeCommentsBtn.addEventListener('click', ()=>{
-            //clearInterval(timer);
             utilFuncs.deleteContent(commentsList);
-            // while (commentsList.firstChild) {
-            //     commentsList.removeChild(commentsList.firstChild);
-            // }
         });
 
     }
@@ -287,13 +282,6 @@
             }
         }
 
-        const presentServerResponse = (message) =>{
-            document.getElementById("toastContent").innerText = message;
-            const toastElem = document.getElementById("liveToast");
-            const toast = new bootstrap.Toast(toastElem);
-            setTimeout( toast.show(),2000);
-        }
-
         const displayApiError = (message) =>{
             const elem = document.getElementById("errorMessage");
             const feed = document.getElementById("feed");
@@ -312,7 +300,6 @@
         return{
             dateFormater : getFormatedDate,
             deleteContent : removeChildElements,
-            informUser : presentServerResponse,
             handleError : displayApiError,
             disableButton : disableElem,
         }
@@ -350,7 +337,6 @@
             loadNewContent(5000);
         })();
 
-        //nasaApi.getNasaContent(utilFuncs.dateFormater(currDate));
 
         moreBtn.addEventListener('click',()=>{
             utilFuncs.disableButton(moreBtn);
@@ -361,8 +347,6 @@
         loadBtn.addEventListener('click', ()=>{
             utilFuncs.deleteContent(feedContent);
             currDate = dateInput.valueAsDate;
-            //utilFuncs.disableButton(loadBtn);
-            //nasaApi.getNasaContent(utilFuncs.dateFormater(currDate));
             loadNewContent(5000);
         })
     });

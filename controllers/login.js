@@ -27,17 +27,14 @@ exports.userLogin = (req, res) => {
                 });
             }
             else{
-                console.log("the user id",user.id)
                 req.session.userID = user.id;
                 req.session.userName = `${user.firstName} ${user.lastName}`;
                 req.session.isConnected = true;
                 res.redirect('/home');
             }
         }).catch((err) => {
-        // console.log('error login', err);
-        // return res.status(400).send(err)
         res.render('index',{
-            message: err,
+            message: err.message,
             completed : false,
             hasError : true
         });
