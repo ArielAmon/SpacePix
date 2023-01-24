@@ -33,7 +33,11 @@ exports.startRegistration = (req, res) => {
 exports.choosePassword = (req, res) => {
     const data = getCookiesData(req, res);
     if(areAllUndefined(data)){
-        res.redirect('/users/register');
+        res.render('index',{
+            completed : false,
+            hasError : true,
+            message : "Registration expired! please start again"
+        });
     }else {
         res.render('register-password',{
             error: "",
@@ -80,7 +84,7 @@ exports.addUserPassword = (req, res) => {
         res.render('index',{
             completed : false,
             hasError : true,
-            message : "Registration expired ! please start again"
+            message : "Registration expired! please start again"
         });
     }else{
         const { password, confirmPassword} = req.body;

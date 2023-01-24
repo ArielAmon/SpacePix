@@ -22,7 +22,7 @@ exports.getImageComments = (req, res) => {
             res.json(imageComments);
         }).catch((err) => {
         console.log('error fetching all image comments', err);
-        return res.status(404).json({code:404,msg:err});
+        return res.status(404).json({code:404,msg: err.messgae});
     });
 };
 
@@ -36,7 +36,7 @@ exports.addComment = (req, res) => {
         })
         .catch((err) => {
             console.log('error adding new comment to db');
-            return res.status(404).json({code:404,msg:err});
+            return res.status(404).json({code:404,msg:err.messgae});
         });
 }
 
@@ -49,6 +49,6 @@ exports.deleteComment = (req, res) => {
             res.status(202).json(count);
         }).catch((err) => {
         console.log('error deleting the comment', err);
-        return res.status(404).json({code:404,msg:err});
+        return res.status(404).json({code:404,msg:err.messgae});
     });
 };

@@ -5,8 +5,6 @@
 // by any given parameter, presented as social media feed.
 // all users can comment or delete their comments and see all other
 // users comments.
-
-
 (()=>{
 
     const keyAPI = "pY612lrnDwt556WmaIYjq5xWTkbOQaB5LAdsbrPi";
@@ -17,7 +15,6 @@
             return Promise.resolve(response)
         } else {
             return response.json().then((data) =>{
-
                 if (!data.msg){
                     return Promise.reject(new Error(`${data.error.code} ${data.error.message} `))
                 }
@@ -81,7 +78,7 @@
             return`
                     <div id="commentSection" class="form-outline mb-4">
                         <label class="form-label" for="commentArea">Comment</label>
-                        <textarea class="form-control" maxlength="128" id="commentArea" rows="4"  style="background: #fff;"></textarea>
+                        <textarea class="form-control"  maxlength="128" id="commentArea" rows="4"  style="background: #fff;" required></textarea>
                         <div class="d-flex flex-start py-4 mb-4 rw-100" style="float: right;">
                             <button id="postCommentButton" type="button" class="btn btn-outline-success" >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-dots" viewBox="0 0 16 16">
@@ -129,7 +126,6 @@
         const serverErrorElem = document.getElementById("serverError");
         const serverError = document.getElementById("serverErrorContent");
         const imageDate = event.target.title;
-        //const timer = setInterval (updateComments,15000);
 
         // Invoked function to fetch all comments from server as comment button of image has been clicked.
         (()=> {
@@ -142,7 +138,6 @@
                 .then(status)
                 .then(json)
                 .then((data) =>{
-                    console.log(data, "and user name is", id);
                     data.forEach((commentData)=>{
                         commentsList.insertAdjacentHTML('beforeend',html.makeComment(commentData));
                         if (commentData.userID === Number(id)){
@@ -161,8 +156,6 @@
         // Function to handle new user`s post. updating both Dom and server.
         function handlePost() {
             const currUserComment = document.getElementById("commentArea").value;
-            document.getElementById("commentArea").value = '';
-            console.log("The data is :",imageDate, userName,id, currUserComment)
             fetch("/home/addImageComment",{
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
@@ -177,6 +170,7 @@
                     comment.insertAdjacentHTML('beforeend',html.makeDeleteButton(data.id));
                     document.getElementById(`deleteCommentButton-${data.id}`).addEventListener('click',handleDeletePost);
                     utilFuncs.disableButton(document.getElementById(`deleteCommentButton-${data.id}`),2500);
+                    document.getElementById("commentArea").value = '';
                 })
                 .catch((error)=> {
                     displayServerError(error);
@@ -200,13 +194,19 @@
         }
 
         function displayServerError(error){
-            utilFuncs.deleteContent(commentsList);
-            serverErrorElem.style.display = 'block';
-            serverError.innerText = error.message;
-            setTimeout(()=>{
-                serverErrorElem.style.display = 'none';
+            if (!document.cookie){
+                console.log("there is no cookies!!")
                 window.location.href = "http://localhost:3000";
-            },3000)
+            }
+            else {
+                utilFuncs.deleteContent(commentsList);
+                serverErrorElem.style.display = 'block';
+                serverError.innerText = error.message;
+                setTimeout(()=>{
+                    serverErrorElem.style.display = 'none';
+                    window.location.href = "http://localhost:3000/home";
+                },7000)
+            }
         }
 
         closeCommentsBtn.addEventListener('click', ()=>{

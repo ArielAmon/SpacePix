@@ -8,7 +8,7 @@ const session = require('express-session');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var homeRouter = require('./routes/home');
-const db = require("./models");
+
 
 var app = express();
 
@@ -41,11 +41,12 @@ function isLoggedIn(req, res, next) {
     console.log("logged in")
     if (req.session.isConnected) {
         next();
-    } else {
+    }
+    else if(!req.cookies.connect) {
         res.redirect('/');
-        // let obj = {code:401,msg:"http://localhost:3000"};
-        // res.status(401).json(obj);
-        // try make a modal for all server errors then direct to login
+    }
+    else {
+        res.redirect('/');
     }
 }
 
@@ -53,7 +54,8 @@ function isNotLoggedIn(req, res, next) {
     console.log("Not logged in")
     if (!req.session.isConnected) {
         next();
-    } else {
+    }
+    else {
         res.redirect('/home');
     }
 }
@@ -61,17 +63,6 @@ function isNotLoggedIn(req, res, next) {
 app.use('/home',nocache, isLoggedIn ,homeRouter);
 app.use('/',nocache, isNotLoggedIn,indexRouter);
 app.use('/users',nocache, isNotLoggedIn,usersRouter);
-
-
-// app.get('/DBcomments', (req, res) => {
-//     return db.Comments.findAll()
-//         .then((users) => res.send(users))
-//         .catch((err) => {
-//             console.log('There was an error querying contacts', JSON.stringify(err))
-//             err.error = 1; // some error code for client side
-//             return res.send(err)
-//         });
-// });
 
 // // catch 404 and forward to error handler
 // app.use(function(req, res, next) {
