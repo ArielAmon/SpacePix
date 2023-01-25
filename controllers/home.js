@@ -1,6 +1,6 @@
 
 const db = require('../models');
-const {Sequelize} = require("sequelize");
+const {Sequelize, Op} = require("sequelize");
 
 function getErrorMessage(error) {
     if (error instanceof Sequelize.ValidationError) {
@@ -42,6 +42,40 @@ exports.getImageComments = (req, res) => {
     });
 };
 
+exports.checkPolling = (req, res) => {
+    const date = req.query.date;
+    const time = req.query.currTime.replace(/\([^()]*\)/g, "");
+    console.log("====================================",time);
+    db.Comments.findAll({
+        paranoid : false,
+        force: true,
+        where: { updatedAt: {[Op.gt]: time}, imageID:date } })
+        .then((imageComments) =>{
+            if(imageComments.length > 0){
+                db.Comments.findAll({ where: { imageID: date } })
+                    .then((Comments) =>{
+                        res.json({ modify:true , comment:Comments});
+                    }).catch((err) => {
+                    return res.status(404).json({code:404,msg: getErrorMessage(err)});
+                });
+            }
+            else{
+                res.json({ modify:false , comment:[]});
+            }
+        }).catch((err) => {
+        return res.status(404).json({code:404,msg: getErrorMessage(err)});
+    });
+};
+
+
+
+
+
+
+
+
+
+
 exports.addComment = (req, res) => {
     const {imageID, user, comment} = req.body;
     db.Comments.create({ imageID:imageID, userName:user, comment:comment, userID:req.session.userID})
@@ -55,10 +89,16 @@ exports.addComment = (req, res) => {
 
 exports.deleteComment = (req, res) => {
     const {id} = req.body;
-    db.Comments.destroy({ where: { id: id } })
-        .then((count) =>{
-            res.status(202).json(count);
-        }).catch((err) => {
+    db.Comments.findOne({ where: { id: id } })
+        .then((comment) =>{
+            if(comment){
+                comment.destroy();
+                res.status(202).json(comment.dataValues.id);
+            }
+        })
+        .catch((err) => {
         return res.status(404).json({code:404,msg:getErrorMessage(err)});
     });
 };
+
+

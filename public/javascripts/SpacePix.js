@@ -135,13 +135,47 @@
         const closeCommentsBtn = document.getElementById("closeCommentsButton");
         const serverErrorElem = document.getElementById("serverError");
         const serverError = document.getElementById("serverErrorContent");
-        //const spinner = document.getElementById("loadingSpinner");
         const imageDate = event.target.title;
+        const timer = setInterval (updateComments,5000);
+        let currTime = new Date().toUTCString();
 
         // Invoked function to fetch all comments from server as comment button of image has been clicked.
         (()=> {
             getCommentsFromServer();
         })();
+
+        function buildComments(data){
+            commentsList.insertAdjacentHTML('beforeend',html.makeLoadingSpinnerElem());
+            setTimeout(()=>{
+                document.getElementById("loadingSpinner").style.display = 'none';
+                data.forEach((commentData)=>{
+                    commentsList.insertAdjacentHTML('beforeend',html.makeComment(commentData));
+                    if (commentData.userID === Number(id)){
+                        const comment = document.getElementById(`comment-${commentData.id}`).querySelector('.card-body');
+                        comment.insertAdjacentHTML('beforeend',html.makeDeleteButton(commentData.id));
+                        document.getElementById(`deleteCommentButton-${commentData.id}`).addEventListener('click',handleDeletePost);
+                    }
+                })
+                commentsList.insertAdjacentHTML('beforeend',html.makePostSection());
+                document.getElementById("postCommentButton").addEventListener('click', handlePost);
+            },2500)
+        }
+
+        function updateComments(){
+            fetch(`/home/pollingComments/?date=${imageDate}&currTime=${currTime}`)
+                .then(status)
+                .then(json)
+                .then((data) =>{
+                   if (data.modify){
+                       currTime = new Date().toUTCString();
+                       utilFuncs.deleteContent(commentsList);
+                       buildComments(data.comment);
+                   }
+                }).catch( (error) =>{
+                displayServerError(error);
+            })
+            console.log("hi polling")
+        }
 
         // Function to receive all comments of given image date.
         function getCommentsFromServer () {
@@ -149,20 +183,22 @@
                 .then(status)
                 .then(json)
                 .then((data) =>{
-                    commentsList.insertAdjacentHTML('beforeend',html.makeLoadingSpinnerElem());
-                    setTimeout(()=>{
-                        document.getElementById("loadingSpinner").style.display = 'none';
-                    data.forEach((commentData)=>{
-                        commentsList.insertAdjacentHTML('beforeend',html.makeComment(commentData));
-                        if (commentData.userID === Number(id)){
-                            const comment = document.getElementById(`comment-${commentData.id}`).querySelector('.card-body');
-                            comment.insertAdjacentHTML('beforeend',html.makeDeleteButton(commentData.id));
-                            document.getElementById(`deleteCommentButton-${commentData.id}`).addEventListener('click',handleDeletePost);
-                        }
-                    })
-                    commentsList.insertAdjacentHTML('beforeend',html.makePostSection());
-                    document.getElementById("postCommentButton").addEventListener('click', handlePost);
-                    },2500)
+                    currTime = new Date().toUTCString();
+                    buildComments(data)
+                    // commentsList.insertAdjacentHTML('beforeend',html.makeLoadingSpinnerElem());
+                    // setTimeout(()=>{
+                    //     document.getElementById("loadingSpinner").style.display = 'none';
+                    // data.forEach((commentData)=>{
+                    //     commentsList.insertAdjacentHTML('beforeend',html.makeComment(commentData));
+                    //     if (commentData.userID === Number(id)){
+                    //         const comment = document.getElementById(`comment-${commentData.id}`).querySelector('.card-body');
+                    //         comment.insertAdjacentHTML('beforeend',html.makeDeleteButton(commentData.id));
+                    //         document.getElementById(`deleteCommentButton-${commentData.id}`).addEventListener('click',handleDeletePost);
+                    //     }
+                    // })
+                    // commentsList.insertAdjacentHTML('beforeend',html.makePostSection());
+                    // document.getElementById("postCommentButton").addEventListener('click', handlePost);
+                    // },2500)
                 }).catch( (error) =>{
                 displayServerError(error);
             })
@@ -179,6 +215,7 @@
                 .then(status)
                 .then(json)
                 .then((data) =>{
+                    currTime = new Date().toUTCString();
                     const elem = document.getElementById("commentSection");
                     elem.insertAdjacentHTML('beforebegin',html.makeComment(data));
                     const comment = document.getElementById(`comment-${data.id}`).querySelector('.card-body');
@@ -202,7 +239,10 @@
             }).then(status)
                 .then(json)
                 .then((data) =>{
-                    if(data) document.getElementById(`comment-${indexToDelete}`).remove();
+                    if(data) {
+                        currTime = new Date();
+                        document.getElementById(`comment-${indexToDelete}`).remove();
+                    }
                 }).catch( (error) =>{
                 displayServerError(error);
             })
@@ -225,6 +265,7 @@
         }
 
         closeCommentsBtn.addEventListener('click', ()=>{
+            clearInterval(timer);
             utilFuncs.deleteContent(commentsList);
         });
 

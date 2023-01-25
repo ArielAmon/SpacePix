@@ -14,13 +14,33 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Comments.init({
-    imageID: DataTypes.STRING,
-    userName: DataTypes.STRING,
-    comment: DataTypes.STRING,
-    userID: DataTypes.INTEGER,
+    imageID : {
+      type:DataTypes.STRING,
+      allowNull:false,
+      validate: {
+        isDate: true,
+      }},
+    userName: {
+      type:DataTypes.STRING,
+      allowNull:false,
+    },
+    comment:{
+      type: DataTypes.STRING,
+      trim: true,
+      allowNull:false,
+      validate:{
+        min:1, max:128
+      }
+    } ,
+    userID:{
+      type: DataTypes.INTEGER,
+      allowNull:false,
+    }
   }, {
     sequelize,
+    paranoid : true,
     modelName: 'Comments',
   });
   return Comments;
 };
+
