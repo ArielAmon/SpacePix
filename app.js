@@ -22,8 +22,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
-
 // enable sessions
 app.use(session({
     secret:"somesecretkey",
@@ -42,8 +40,13 @@ function isLoggedIn(req, res, next) {
     if (req.session.isConnected) {
         next();
     }
-    else if(!req.cookies.connect) {
-        res.redirect('/');
+    else if (Object.entries(req.cookies).length === 0 && req.session) {
+        if (req.originalUrl !== '/home'){
+            res.status(401).json({code:401,msg:"Session Expired! your about to redirect to Login page."});
+        }
+        else{
+            res.redirect('/');
+        }
     }
     else {
         res.redirect('/');
@@ -63,21 +66,5 @@ function isNotLoggedIn(req, res, next) {
 app.use('/home',nocache, isLoggedIn ,homeRouter);
 app.use('/',nocache, isNotLoggedIn,indexRouter);
 app.use('/users',nocache, isNotLoggedIn,usersRouter);
-
-// // catch 404 and forward to error handler
-// app.use(function(req, res, next) {
-//   next(createError(404));
-// });
-
-// // error handler
-// app.use(function(err, req, res, next) {
-//   // set locals, only providing error in development
-//   res.locals.message = err.message;
-//   res.locals.error = req.app.get('env') === 'development' ? err : {};
-//
-//   // render the error page
-//   res.status(err.status || 500);
-//   res.render('error');
-// });
 
 module.exports = app;

@@ -194,18 +194,19 @@
         }
 
         function displayServerError(error){
-            // if (!document.cookie){
-            //     window.location.href = "http://localhost:3000";
-            // }
-            // else {
-                utilFuncs.deleteContent(commentsList);
-                serverErrorElem.style.display = 'block';
-                serverError.innerText = error.message;
-                setTimeout(()=>{
-                    serverErrorElem.style.display = 'none';
-                    window.location.href = "http://localhost:3000/home";
-                },7000)
-            //}
+            let url =  "http://localhost:3000/home";
+            const code = error.message.split(' ')[0];
+             if (code === '401'){
+                 url = "http://localhost:3000";
+             }
+            utilFuncs.deleteContent(commentsList);
+            serverErrorElem.style.display = 'block';
+            serverError.innerText = error.message;
+            setTimeout(()=>{
+                serverErrorElem.style.display = 'none';
+                window.location.href = url;
+            },4000)
+
         }
 
         closeCommentsBtn.addEventListener('click', ()=>{
@@ -285,6 +286,7 @@
         const displayApiError = (message) =>{
             const elem = document.getElementById("errorMessage");
             const feed = document.getElementById("feed");
+            document.getElementById("moreButton").style.display = 'none';
             feed.style.display = "none";
             elem.style.display = "block";
             document.getElementById("errorContent").innerText = message;
@@ -317,7 +319,6 @@
         const moreBtn = document.getElementById("moreButton");
         const feedContent = document.getElementById("feed");
         const loadContentElem = document.getElementById("loading-1");
-
         const nasaApi = handleNasaApi();
         const utilFuncs = utilities();
 

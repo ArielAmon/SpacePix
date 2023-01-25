@@ -1,5 +1,6 @@
 const Cookies = require('cookies');
-const db = require('../models'); //contain the Contact model, which is accessible via db.Contact
+const db = require('../models');
+const {Sequelize} = require("sequelize"); //contain the Contact model, which is accessible via db.Contact
 const keys = ['keyboard cat']
 
 function getCookiesData(req, res){
@@ -12,6 +13,23 @@ function getCookiesData(req, res){
 
 function areAllUndefined(arr){
     return arr.includes(undefined) || arr.includes(null);
+}
+
+function getErrorMessage(error) {
+    if (error instanceof Sequelize.ValidationError) {
+        console.log(error.errors.map(err => err.message).join(', '))
+        return error.errors.map(err => err.message).join(', ');
+    } else if (error instanceof Sequelize.UniqueConstraintError) {
+        return error.message;
+    } else if (error instanceof Sequelize.ForeignKeyConstraintError) {
+        return error.message;
+    } else if (error instanceof Sequelize.ExclusionConstraintError) {
+        return error.message;
+    } else if (error instanceof Sequelize.DatabaseError) {
+        return error.original ? error.original.message : error.message;
+    } else {
+        return 'An unknown error occurred';
+    }
 }
 
 exports.startRegistration = (req, res) => {
@@ -68,7 +86,7 @@ exports.addUserContact = (req, res) => {
         }).catch((err) => {
         res.render('register', {
             hasError: true,
-            error: err.errors[0].message,
+            error: getErrorMessage(err),
             userEmail : '',
             userFirstName : '',
             userLastName : ''
@@ -96,7 +114,7 @@ exports.addUserPassword = (req, res) => {
         db.User.create({ email:data[0], firstName:data[1], lastName:data[2], password:password})
             .then((contact) => {
                 res.render('index',{
-                    message: "Congratulations ! You are now registered 🥳",
+                    message: `Congratulations ${contact.dataValues.firstName} ${contact.dataValues.lastName} ! You are now registered 🥳`,
                     completed : true,
                     hasError : false,
                 });
@@ -104,7 +122,7 @@ exports.addUserPassword = (req, res) => {
             .catch((err) => {
                 res.render('register', {
                     hasError: true,
-                    error: err.errors[0].message,
+                    error: getErrorMessage(err),
                     userEmail : '',
                     userFirstName : '',
                     userLastName : ''
