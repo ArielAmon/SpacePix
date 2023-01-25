@@ -102,11 +102,21 @@
                 </button>\n`
         }
 
+        const addSpinner = () =>{
+            return`
+                <div class="d-flex justify-content-center" >
+                  <div id="loadingSpinner" class="spinner-border" role="status" style="display: block">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                </div>`
+        }
+
         return {
             makeImageCard : createCard,
             makeComment : createComment,
             makePostSection : addPostSection,
             makeDeleteButton : addDeleteButton,
+            makeLoadingSpinnerElem : addSpinner,
         }
     }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -125,6 +135,7 @@
         const closeCommentsBtn = document.getElementById("closeCommentsButton");
         const serverErrorElem = document.getElementById("serverError");
         const serverError = document.getElementById("serverErrorContent");
+        //const spinner = document.getElementById("loadingSpinner");
         const imageDate = event.target.title;
 
         // Invoked function to fetch all comments from server as comment button of image has been clicked.
@@ -138,6 +149,9 @@
                 .then(status)
                 .then(json)
                 .then((data) =>{
+                    commentsList.insertAdjacentHTML('beforeend',html.makeLoadingSpinnerElem());
+                    setTimeout(()=>{
+                        document.getElementById("loadingSpinner").style.display = 'none';
                     data.forEach((commentData)=>{
                         commentsList.insertAdjacentHTML('beforeend',html.makeComment(commentData));
                         if (commentData.userID === Number(id)){
@@ -148,6 +162,7 @@
                     })
                     commentsList.insertAdjacentHTML('beforeend',html.makePostSection());
                     document.getElementById("postCommentButton").addEventListener('click', handlePost);
+                    },2500)
                 }).catch( (error) =>{
                 displayServerError(error);
             })
