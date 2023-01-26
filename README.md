@@ -27,6 +27,7 @@ Two databases are used: one for users and one for comments, which are connected 
 - Node.js
 - Express
 - Sequelize (for database management)
+- SQlite
 
 Note
 Please make sure to check the package.json file for any additional dependencies you may need to install in order to run the project.
