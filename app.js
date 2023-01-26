@@ -30,13 +30,14 @@ app.use(session({
     cookie: {maxAge: 10*60*1000 } // milliseconds!
 }));
 
+// Middleware for disable browser caching
 function nocache(req, res, next) {
     res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0,max-age=0,s-maxage=0');
     next();
 }
 
+// Middleware to check if user logged in for Home page requests
 function isLoggedIn(req, res, next) {
-    console.log("logged in")
     if (req.session.isConnected) {
         next();
     }
@@ -53,8 +54,8 @@ function isLoggedIn(req, res, next) {
     }
 }
 
+// Middleware to check if user not logged in for registration and login requests
 function isNotLoggedIn(req, res, next) {
-    console.log("Not logged in")
     if (!req.session.isConnected) {
         next();
     }

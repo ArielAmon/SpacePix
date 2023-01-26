@@ -17,7 +17,6 @@ function areAllUndefined(arr){
 
 function getErrorMessage(error) {
     if (error instanceof Sequelize.ValidationError) {
-        console.log(error.errors.map(err => err.message).join(', '))
         return error.errors.map(err => err.message).join(', ');
     } else if (error instanceof Sequelize.UniqueConstraintError) {
         return error.message;

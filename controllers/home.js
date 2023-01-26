@@ -4,7 +4,6 @@ const {Sequelize, Op} = require("sequelize");
 
 function getErrorMessage(error) {
     if (error instanceof Sequelize.ValidationError) {
-        console.log(error.errors.map(err => err.message).join(', '))
         return error.errors.map(err => err.message).join(', ');
     } else if (error instanceof Sequelize.UniqueConstraintError) {
         return error.message;
@@ -44,8 +43,7 @@ exports.getImageComments = (req, res) => {
 
 exports.checkPolling = (req, res) => {
     const date = req.query.date;
-    const time = req.query.currTime.replace(/\([^()]*\)/g, "");
-    console.log("====================================",time);
+    const time = req.query.currTime;
     db.Comments.findAll({
         paranoid : false,
         force: true,

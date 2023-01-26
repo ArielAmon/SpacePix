@@ -80,7 +80,7 @@
                         <label class="form-label" for="commentArea">Comment</label>
                         <textarea class="form-control"  maxlength="128" id="commentArea" rows="4"  style="background: #fff;" required></textarea>
                         <div class="d-flex flex-start py-4 mb-4 rw-100" style="float: right;">
-                            <button id="postCommentButton" type="button" class="btn btn-outline-success" >
+                            <button id="postCommentButton" type="button" class="btn btn-outline-success" disabled>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-dots" viewBox="0 0 16 16">
                                     <path d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
                                     <path d="m2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9.06 9.06 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.437 10.437 0 0 1-.524 2.318l-.003.011a10.722 10.722 0 0 1-.244.637c-.079.186.074.394.273.362a21.673 21.673 0 0 0 .693-.125zm.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6c0 3.193-3.004 6-7 6a8.06 8.06 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a10.97 10.97 0 0 0 .398-2z"/>
@@ -122,6 +122,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Function (Module) that handles all operations on the comment section
+     * Add and delete comments , as well as polling for comments update
      * @param event
      */
     function commentsController(event){
@@ -136,7 +137,7 @@
         const serverErrorElem = document.getElementById("serverError");
         const serverError = document.getElementById("serverErrorContent");
         const imageDate = event.target.title;
-        const timer = setInterval (updateComments,5000);
+        const timer = setInterval (updateComments,15000);
         let currTime = new Date().toUTCString();
 
         // Invoked function to fetch all comments from server as comment button of image has been clicked.
@@ -144,6 +145,16 @@
             getCommentsFromServer();
         })();
 
+        // function to check if the user enter a commnet and its is not empty one
+        function checkEmptyComment(){
+            const comment = document.getElementById("commentArea").value.trim();
+            document.getElementById("postCommentButton").disabled = !comment;
+        }
+
+        /**
+         * Builds the comments received from server at the comments modal
+         * @param data
+         */
         function buildComments(data){
             commentsList.insertAdjacentHTML('beforeend',html.makeLoadingSpinnerElem());
             setTimeout(()=>{
@@ -157,10 +168,14 @@
                     }
                 })
                 commentsList.insertAdjacentHTML('beforeend',html.makePostSection());
+                document.getElementById("commentArea").addEventListener('input', checkEmptyComment);
                 document.getElementById("postCommentButton").addEventListener('click', handlePost);
             },2500)
         }
 
+        /**
+         * Executing the polling each 15 sec to update comments to the latest version from the comments DB
+         */
         function updateComments(){
             fetch(`/home/pollingComments/?date=${imageDate}&currTime=${currTime}`)
                 .then(status)
@@ -174,10 +189,11 @@
                 }).catch( (error) =>{
                 displayServerError(error);
             })
-            console.log("hi polling")
         }
 
-        // Function to receive all comments of given image date.
+        /**
+         *  Function to receive all comments of given image date from server -> comments DB.
+         */
         function getCommentsFromServer () {
             fetch(`/home/getImageComments/?date=${imageDate}`)
                 .then(status)
@@ -185,28 +201,17 @@
                 .then((data) =>{
                     currTime = new Date().toUTCString();
                     buildComments(data)
-                    // commentsList.insertAdjacentHTML('beforeend',html.makeLoadingSpinnerElem());
-                    // setTimeout(()=>{
-                    //     document.getElementById("loadingSpinner").style.display = 'none';
-                    // data.forEach((commentData)=>{
-                    //     commentsList.insertAdjacentHTML('beforeend',html.makeComment(commentData));
-                    //     if (commentData.userID === Number(id)){
-                    //         const comment = document.getElementById(`comment-${commentData.id}`).querySelector('.card-body');
-                    //         comment.insertAdjacentHTML('beforeend',html.makeDeleteButton(commentData.id));
-                    //         document.getElementById(`deleteCommentButton-${commentData.id}`).addEventListener('click',handleDeletePost);
-                    //     }
-                    // })
-                    // commentsList.insertAdjacentHTML('beforeend',html.makePostSection());
-                    // document.getElementById("postCommentButton").addEventListener('click', handlePost);
-                    // },2500)
                 }).catch( (error) =>{
                 displayServerError(error);
             })
         }
 
-        // Function to handle new user`s post. updating both Dom and server.
+        /**
+         * Function to handle new user`s post. updating both Dom and server -> comments DB
+         */
         function handlePost() {
-            const currUserComment = document.getElementById("commentArea").value;
+            const currUserComment = document.getElementById("commentArea").value.trim();
+            document.getElementById("commentArea").value = "";
             fetch("/home/addImageComment",{
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
@@ -222,14 +227,17 @@
                     comment.insertAdjacentHTML('beforeend',html.makeDeleteButton(data.id));
                     document.getElementById(`deleteCommentButton-${data.id}`).addEventListener('click',handleDeletePost);
                     utilFuncs.disableButton(document.getElementById(`deleteCommentButton-${data.id}`),2500);
-                    document.getElementById("commentArea").value = '';
+                    document.getElementById("postCommentButton").disabled = true;
                 })
                 .catch((error)=> {
                     displayServerError(error);
                 });
         }
 
-        // Function to handle user`s deleting a post (only his own). updating both Dom and server.
+        /**
+         * Function to handle user`s deleting a post (only his own). updating both Dom and server -> comments DB
+         * @param event
+         */
         function handleDeletePost(event){
             const indexToDelete = event.target.id.split('-')[1];
             fetch("/home/deleteComment",{
@@ -240,7 +248,7 @@
                 .then(json)
                 .then((data) =>{
                     if(data) {
-                        currTime = new Date();
+                        currTime = new Date().toUTCString();
                         document.getElementById(`comment-${indexToDelete}`).remove();
                     }
                 }).catch( (error) =>{
@@ -248,6 +256,12 @@
             })
         }
 
+        /**
+         * Function to display all servers errors getting from the server about operations related to comments.
+         * If it is a there is connection interrupt redirect to login page
+         * Otherwise reloading the home page
+         * @param error
+         */
         function displayServerError(error){
             let url =  "http://localhost:3000/home";
             const code = error.message.split(' ')[0];
@@ -260,10 +274,13 @@
             setTimeout(()=>{
                 serverErrorElem.style.display = 'none';
                 window.location.href = url;
-            },4000)
+            },4500)
 
         }
 
+        /**
+         * closing comments modal
+         */
         closeCommentsBtn.addEventListener('click', ()=>{
             clearInterval(timer);
             utilFuncs.deleteContent(commentsList);
@@ -282,7 +299,11 @@
         const utilFuncs = utilities();
         const imageIncrease = 3 ;
 
-        // Function to calculate the differences between date
+        /**
+         * Function to calculate the differences between date
+         * @param date
+         * @returns {(number|number)[]}
+         */
         function calcRangedDate (date){
             const year = date[2];
             const month = date[1] - 1;
@@ -293,8 +314,11 @@
 
         }
 
-        // Function to get a constant number of images from NASA API.
-        // Each image added to the main page feed.
+        /**
+         *  Function to get a constant number of images from NASA API.
+         *  Each image added to the main page feed.
+         * @param chosenDate
+         */
         const getNasaImages = (chosenDate) => {
             const [end_day, end_month, end_year] = chosenDate;
             const [start_day, start_month, start_year] = calcRangedDate(chosenDate);
@@ -322,7 +346,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Function (Module) for some utilities function needed for various Modules.
-     * @returns {{handleError: displayApiError, informUser: presentServerResponse, deleteContent: removeChildElements, dateFormater: (function(*): [string,string,number]), validateName: (function(*))}}
+     * @returns {{disableButton: disableElem, handleError: displayApiError, deleteContent: removeChildElements, dateFormater: (function(*): [string,string,number])}}
      */
     function utilities (){
 
