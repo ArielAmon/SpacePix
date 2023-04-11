@@ -1,5 +1,4 @@
-# EX6_Ariel_Amon
-Email: arielam@edu.hac.ac.il
+
 
 This is project is a scoial media web app for registered users view NASA images of the day as post, also post comments and delete them.
 The client side of the application is built using JavaScript, while the server side is built using Node.js and Express. 
